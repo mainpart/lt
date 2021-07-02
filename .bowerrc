@@ -1,0 +1,9 @@
+{
+    "directory":"vendor/",
+    "ignoredDependencies": [
+        "jquery",
+        "jquery-ui",
+        "momentjs"
+       ]
+
+}

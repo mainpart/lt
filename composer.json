@@ -1,0 +1,17 @@
+{
+    "name": "dykrasni/lt",
+    "authors": [
+        {
+            "name": "Дмитрий",
+            "email": "dykrasni@mts.ru"
+        }
+    ],
+    "require": {},
+
+    "autoload": {
+        "psr-4": {
+            "Lt\\": "src/"
+        },
+        "classmap" : ["src/"]
+    }
+}
