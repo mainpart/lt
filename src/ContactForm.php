@@ -115,10 +115,12 @@ class ContactForm {
 	function redirect_cf7() {
 		?>
         <script type="text/javascript">
-            document.addEventListener('wpcf7mailsent', function (event) {
+	var fun = function (event) {
                 if (typeof event.detail.apiResponse.redirect === 'undefined') return;
                 window.location = event.detail.apiResponse.redirect;
-            }, false);
+            }
+            document.addEventListener('wpcf7mailsent', fun, false);
+	    document.addEventListener('wpcf7mailfailed', fun, false);
         </script>
 		<?php
 	}

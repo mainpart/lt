@@ -70,7 +70,7 @@ class Users {
 
 		$nowdt = new \DateTimeImmutable();
 		/** @var $duedate1 DateTime - Timestamp предупреждения об окончании подписки */
-		$options = get_option(Settings::$option_prefix . '_plugin_options_timing', true);
+		$options  = get_option( Settings::$option_prefix . '_plugin_options_timing', true );
 		$duedate1 = $nowdt->sub( new \DateInterval( Settings::parse_date_time(
 
 			$options['endsoon_timevalue'],
@@ -113,8 +113,8 @@ class Users {
 			wp_schedule_single_event( $paidfrom, '\Lt\Notify', $user_id );
 		}
 		if ( $paidto ) {
-			$end = DateTime::createFromFormat( "U", $paidto );
-			$options = get_option(Settings::$option_prefix . '_plugin_options_template',true);
+			$end     = DateTime::createFromFormat( "U", $paidto );
+			$options = get_option( Settings::$option_prefix . '_plugin_options_template', true );
 			wp_schedule_single_event( $end->sub( new \DateInterval(
 				Settings::parse_date_time(
 					$options['endsoon_timevalue'],
@@ -133,12 +133,14 @@ class Users {
 	 * @param $user_id
 	 *
 	 */
-	public static function user_register(		$user_id	) {
-		$user = new \WP_User($user_id);
+	public static function user_register( $user_id ) {
+		$user = new \WP_User( $user_id );
 		// доступ предоставляется только подписчикам
-		if (!Users::user_is('subscriber', $user)) return;
-		$start = new DateTime();
-		$options = get_option(Settings::$option_prefix . '_plugin_options_timing',true);
+		if ( ! Users::user_is( 'subscriber', $user ) ) {
+			return;
+		}
+		$start   = new DateTime();
+		$options = get_option( Settings::$option_prefix . '_plugin_options_timing', true );
 		update_user_meta( $user_id, 'paidfrom', $paidfrom = $start->setTime( 0, 0, 0 )->getTimestamp() );
 		update_user_meta( $user_id, 'paidto', $paidto = $start->add( new \DateInterval(
 
@@ -159,7 +161,7 @@ class Users {
 	 *
 	 * @return bool
 	 */
-	public	static function is_active(		$user_id	) {
+	public static function is_active( $user_id ) {
 		$from_unixtime = get_user_meta( $user_id, 'paidfrom', true );
 		$to_unixtime   = get_user_meta( $user_id, 'paidto', true );
 		switch ( true ) {
@@ -183,8 +185,7 @@ class Users {
 		}
 	}
 
-	public
-	static function is_future(
+	public static function is_future(
 		$user_id
 	) {
 		$from_unixtime = get_user_meta( $user_id, 'paidfrom', true );
@@ -196,9 +197,19 @@ class Users {
 		}
 	}
 
+	public static function is_noset( $user_id ) {
+		$from_unixtime = get_user_meta( $user_id, 'paidfrom', true );
+		$to_unixtime   = get_user_meta( $user_id, 'paidto', true );
+		switch ( true ) {
+			case ! $from_unixtime && ! $to_unixtime:
+				return true;
+			default:
+				return false;
+		}
+	}
 
-	public
-	static function new_modify_user_table(
+
+	public static function new_modify_user_table(
 		$column
 	) {
 
@@ -226,9 +237,9 @@ class Users {
 			case 'access' :
 				$paidfrom       = get_user_meta( $user_id, 'paidfrom', true );
 				$paidto         = get_user_meta( $user_id, 'paidto', true );
-				$date_time_from = (new DateTime())->setTimestamp( $paidfrom )->format('c');
-				$date_time_to   = (new DateTime())->setTimestamp( $paidto )->format('c');
-				$val            = "<div class='paidtill_{$user_id}' data-user-id='{$user_id}'><span class='paidtill'><input data-to='" .  esc_attr( $date_time_to )  . "' data-from='" . esc_attr( $date_time_from ) . "' class='paidtill' name='paidtill[{$user_id}]' type='hidden' /></span></div>";
+				$date_time_from = ( new DateTime() )->setTimestamp( $paidfrom )->format( 'c' );
+				$date_time_to   = ( new DateTime() )->setTimestamp( $paidto )->format( 'c' );
+				$val            = "<div class='paidtill_{$user_id}' data-user-id='{$user_id}'><span class='paidtill'><input data-to='" . esc_attr( $date_time_to ) . "' data-from='" . esc_attr( $date_time_from ) . "' class='paidtill' name='paidtill[{$user_id}]' type='hidden' /></span></div>";
 				break;
 			default:
 		}
@@ -244,8 +255,8 @@ class Users {
 		$user = wp_get_current_user();
 		if ( $user && current_user_can( 'edit_posts' ) ) {
 			// меняем статус
-			$from = (new DateTime($_POST['from']))->getTimestamp();
-			$to = (new DateTime($_POST['to']))->getTimestamp();
+			$from = ( new DateTime( $_POST['from'] ) )->getTimestamp();
+			$to   = ( new DateTime( $_POST['to'] ) )->getTimestamp();
 
 			update_user_meta( $_POST['userid'], 'paidfrom', $from );
 			update_user_meta( $_POST['userid'], 'paidto', $to );

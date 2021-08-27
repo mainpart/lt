@@ -10,8 +10,8 @@ class Amelia {
 	public static function init() {
 		if ( ! self::$initiated ) {
 			self::$initiated = true;
-			add_action( 'AmeliabookingStatusUpdated', [ self::class, 'process' ] );
-			//add_action( 'AmeliabookingAdded', [ self::class, 'added' ] );
+			add_action( 'AmeliaBookingStatusUpdated', [ self::class, 'process' ] );
+			add_action( 'AmeliaBookingAdded', [ self::class, 'added' ] );
 
 		}
 
@@ -26,15 +26,32 @@ class Amelia {
 	public static function added( $reservation ) {
 		global $wpdb;
 		if (Users::user_is('subscriber')) {
-			if ( $reservation['status'] == 'pending' ) {
+//file_put_contents(__DIR__."/debug.txt", var_export($reservation, true));			
+if ( $reservation['status'] == 'pending' ) {
 				foreach ( $reservation['bookings'] as $booking ) {
 					$user = get_user_by_email( $wpdb->get_var( $wpdb->prepare( "SELECT email from `{$wpdb->prefix}amelia_users` where id = %d ", $booking['customerId'] ) ) );
 					if ( ! $user ) {
 						continue;
 					}
-					delete_user_meta( $user->ID, 'paidfrom' );
-					delete_user_meta( $user->ID, 'paidto' );
-					do_action( 'Lt\PaidChange', $user->ID, null, null );
+					//delete_user_meta( $user->ID, 'paidfrom' );
+					//delete_user_meta( $user->ID, 'paidto' );
+					//do_action( 'Lt\PaidChange', $user->ID, null, null );
+				$start = \DateTime::createFromFormat( 'Y-m-d H:i:s', $booking['payments'][0]['dateTime'] );
+				$options = get_option(Settings::$option_prefix . '_plugin_options_timing',true);
+				update_user_meta( $user->ID, 'paidfrom', $paidfrom = $start->setTime(0,0,0)->getTimestamp() );
+				update_user_meta( $user->ID, 'paidto', $paidto = $start->add( new \DateInterval(
+
+						Settings::parse_date_time(
+							$options['approve_timevalue'],
+							$options['approve_timespan'],
+							'P3D' )
+
+					)
+
+
+				 )->setTime( 23, 59, 59 )->getTimestamp());
+				do_action( 'Lt\PaidChange', $user->ID, $paidfrom, $paidto );
+
 				}
 			}
 		}
