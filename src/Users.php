@@ -172,10 +172,7 @@ class Users {
 		}
 	}
 
-	public
-	static function is_past(
-		$user_id
-	) {
+	public static function is_past( $user_id ) {
 		$to_unixtime = get_user_meta( $user_id, 'paidto', true );
 		switch ( true ) {
 			case ! empty( $to_unixtime ) && time() > $to_unixtime:
@@ -185,8 +182,7 @@ class Users {
 		}
 	}
 
-	public static function is_future(
-		$user_id
+	public static function is_future( $user_id
 	) {
 		$from_unixtime = get_user_meta( $user_id, 'paidfrom', true );
 		switch ( true ) {
@@ -209,9 +205,7 @@ class Users {
 	}
 
 
-	public static function new_modify_user_table(
-		$column
-	) {
+	public static function new_modify_user_table( $column ) {
 
 		if ( current_user_can( 'manage_options' ) ) {
 			$column['access'] = __( 'Access due date', 'lt' );

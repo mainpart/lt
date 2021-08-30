@@ -48,6 +48,11 @@ class Settings {
 		echo '<p>Настройки переадресации для пользователей, чья дата активности прошла</p>';
 	}
 
+	function dbi_plugin_redirect_text_noinfo() {
+		echo '<p>Настройки переадресации для пользователей, у которых не проставлена дата активности</p>';
+	}
+
+
 	function dbi_plugin_template_text() {
 		echo '<p>Здесь задаются различные опции шаблонов. В шаблонах в скобочках { } можно использовать любые поля или мета-поля пользователя, такие как user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name и пр</p>';
 	}
@@ -75,6 +80,10 @@ class Settings {
 			self::class,
 			'dbi_plugin_redirect_text_past'
 		], 'redirect' );
+		add_settings_section( 'redirects_options_noinfo', 'Переадресация для неустановленных пользователей', [
+			self::class,
+			'dbi_plugin_redirect_text_noinfo'
+		], 'redirect' );
 
 		add_settings_field( self::$option_prefix . '_redirect_login_active', 'Переадресация после входа', [
 			self::class,
@@ -88,6 +97,10 @@ class Settings {
 			self::class,
 			'dbi_plugin_setting_redirect_login_past'
 		], 'redirect', 'redirects_options_past' );
+		add_settings_field( self::$option_prefix . '_redirect_login_noinfo', 'Переадресация после входа', [
+			self::class,
+			'dbi_plugin_setting_redirect_login_noinfo'
+		], 'redirect', 'redirects_options_noinfo' );
 
 
 		add_settings_section( 'subscribe_options', null, [
@@ -165,6 +178,10 @@ class Settings {
 		echo "<input type='text' name='lt_plugin_options_redirects[login_past]' value='" . esc_attr( isset( $options['login_past'] ) ? $options['login_past'] : '' ) . "' />";
 	}
 
+	public static function dbi_plugin_setting_redirect_login_noinfo() {
+		$options = get_option( self::$option_prefix . '_plugin_options_redirects' );
+		echo "<input type='text' name='lt_plugin_options_redirects[login_noinfo]' value='" . esc_attr( isset( $options['login_noinfo'] ) ? $options['login_noinfo'] : '' ) . "' />";
+	}
 
 	function dbi_plugin_setting_template_soon() {
 		?>

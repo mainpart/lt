@@ -43,9 +43,6 @@ class Redirects {
 	}
 
 
-
-
-
 	/**
 	 * Редирект после логина
 	 *
@@ -68,43 +65,39 @@ class Redirects {
 		}
 
 		// если это подписчик то пробуем закинуть его на его консультацию
-		if (Users::user_is('subscriber', $user)) {
+		if ( Users::user_is( 'subscriber', $user ) ) {
 			remove_filter( 'posts_results', [ PostType::class, 'posts_results' ] );
 			$query = new \WP_Query( [
-				'author' =>$user->ID,
+				'author'      => $user->ID,
 				'post_type'   => PostType::POST_TYPE,
 				'post_status' => [ 'publish' ],
 			] );
 
 			if ( $query->post_count ) {
-				$redirect = $query->post->ID;
+				$redirect    = $query->post->ID;
 				$redirect_to = get_post_permalink( $redirect );
 			}
-		} elseif (Users::user_is('homeopath', $user)) {
+		} elseif ( Users::user_is( 'homeopath', $user ) ) {
 			// гомеопата переадресовываем на список консультаций
-			$redirect_to = get_site_url(null, '/?post_type='.PostType::POST_TYPE);
+			$redirect_to = get_site_url( null, '/?post_type=' . PostType::POST_TYPE );
 		}
 
 
 		$options = get_option( 'lt_plugin_options_redirects', true );
 		switch ( true ) {
 			case Users::is_active( $user->ID ) && ! empty( $options['login_active'] ) :
-				if ( ! empty( $options['login_active'] ) ) {
-					$redirect_to = $options['login_active'];
-				}
+				$redirect_to = $options['login_active'];
 				break;
 			case Users::is_future( $user->ID ) && ! empty( $options['login_future'] ) :
-				if ( ! empty( $options['login_future'] ) ) {
-					$redirect_to = $options['login_future'];
-				}
+				$redirect_to = $options['login_future'];
 				break;
 			case Users::is_past( $user->ID ) && ! empty( $options['login_past'] ):
-				if ( ! empty( $options['login_past'] ) ) {
-					$redirect_to = $options['login_past'];
-				}
+				$redirect_to = $options['login_past'];
+				break;
+			case Users::is_noset( $user->ID ) && ! empty( $options['login_noinfo'] ):
+				$redirect_to = $options['login_noinfo'];
+				break;
 		}
-
-
 
 
 		return $redirect_to;
