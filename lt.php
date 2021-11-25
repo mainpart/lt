@@ -1,11 +1,15 @@
 <?php
+
 /*
-Plugin Name: isolated posts
-Description: 
-Version: 1.0
-Author: Dmitry Krasnikov
-Text Domain: lt
-Domain Path: /languages
+   Plugin Name: LifeTutor
+   Author: Dmitry Krasnikov <dmitry.krasnikov@gmail.com>
+   License: GPLv2 or later
+   Text Domain: pharma
+   GitHub Plugin URI: https://github.com/mainpart/lt
+   Primary Branch: main
+   Domain Path: /languages
+   Version: 1.0.1
+   Description: Плагин для организации консультаций
 */
 
 namespace Lt;

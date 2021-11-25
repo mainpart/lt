@@ -6,7 +6,9 @@
             "email": "dykrasni@mts.ru"
         }
     ],
-    "require": {},
+    "require": {
+        "afragen/wp-dependency-installer": "^4.2"
+    },
 
     "autoload": {
         "psr-4": {

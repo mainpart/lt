@@ -86,13 +86,19 @@ class Redirects {
 		$options = get_option( 'lt_plugin_options_redirects', true );
 		switch ( true ) {
 			case Users::is_active( $user->ID ) && ! empty( $options['login_active'] ) :
-				$redirect_to = $options['login_active'];
+				if ( ! empty( $options['login_active'] ) ) {
+					$redirect_to = $options['login_active'];
+				}
 				break;
 			case Users::is_future( $user->ID ) && ! empty( $options['login_future'] ) :
-				$redirect_to = $options['login_future'];
+				if ( ! empty( $options['login_future'] ) ) {
+					$redirect_to = $options['login_future'];
+				}
 				break;
 			case Users::is_past( $user->ID ) && ! empty( $options['login_past'] ):
-				$redirect_to = $options['login_past'];
+				if ( ! empty( $options['login_past'] ) ) {
+					$redirect_to = $options['login_past'];
+				}
 				break;
 			case Users::is_noset( $user->ID ) && ! empty( $options['login_noinfo'] ):
 				$redirect_to = $options['login_noinfo'];

@@ -16,10 +16,9 @@ class ContactForm {
 		if ( ! self::$initiated && class_exists( 'WPCF7_Submission' ) ) {
 			self::$initiated = true;
 			add_filter( 'wpcf7_verify_nonce', '__return_true' );
-			add_filter( 'wpcf7_ajax_json_echo', [ self::class, 'inject_redirect' ] , 10);
+			add_filter( 'wpcf7_ajax_json_echo', [ self::class, 'inject_redirect' ], 10 );
 			add_action( 'wp_footer', [ self::class, 'redirect_cf7' ] );
-			add_action( 'wpcf7_before_send_mail', [ self::class, 'before_send_email' ], 10 ,3 );
-
+			add_action( 'wpcf7_before_send_mail', [ self::class, 'before_send_email' ], 10, 3 );
 
 
 		}
@@ -27,8 +26,9 @@ class ContactForm {
 	}
 
 	/**
-     * Если заполненная форма содержит тэг is_consult то эта контактная форма - для консультации
-     * Соответственно заполняем пользовательскую консультацию в связи с этой формой
+	 * Если заполненная форма содержит тэг is_consult то эта контактная форма - для консультации
+	 * Соответственно заполняем пользовательскую консультацию в связи с этой формой
+	 *
 	 * @param $contact_form
 	 */
 	public static function before_send_email( $contact_form ) {
@@ -40,7 +40,7 @@ class ContactForm {
 		}
 		global $consultation_page_id;
 		// присваиваем $author_id либо текущего пользователя либо админа
-		if ( is_user_lowp_before_admin_bar_rendergged_in() ) {
+		if ( is_user_logged_in() ) {
 			$author_id = get_current_user_id();
 		} else {
 			$ids = get_users( [ 'role' => 'Administrator' ] );
@@ -62,38 +62,42 @@ class ContactForm {
 		global $consultation_page_id;
 
 		$query = new \WP_Query( [
-			'author'=>$author_id,
-            'post_type'   => PostType::POST_TYPE,
+			'author'      => $author_id,
+			'post_type'   => PostType::POST_TYPE,
 			'post_status' => [ 'publish' ],
 		] );
-        $user = new \WP_User($author_id);
-        // создаем запись либо берем существующую запись для клиента
-        if ($query->have_posts()){
-	        $consultation_page_id = $query->posts[0]->ID;
-        } else {
-	        $consultation_page_id = wp_insert_post( [
-		        'post_author' => $author_id,
-		        'post_title'  => $contact_form->title() . " ".$user->user_login,
-		        'post_type'   => PostType::POST_TYPE,
-		        'post_status' => 'publish',
-	        ] );
-	        update_post_meta( $consultation_page_id, 'client_id', $author_id );
-        }
-        // пишем комментарий клиента в эту запись
+		$user  = new \WP_User( $author_id );
+		// создаем запись либо берем существующую запись для клиента
+		if ( $query->have_posts() ) {
+			$consultation_page_id = $query->posts[0]->ID;
+		} else {
+			$consultation_page_id = wp_insert_post( [
+				'post_author' => $author_id,
+				'post_title'  => $contact_form->title() . " " . $user->user_login,
+				'post_type'   => PostType::POST_TYPE,
+				'post_status' => 'publish',
+			] );
+			update_post_meta( $consultation_page_id, 'client_id', $author_id );
+		}
+		// пишем комментарий клиента в эту запись
 		if ( $consultation_page_id ) {
 
-            // устанавливаем редирект на поле формы либо на эту запись
+			// устанавливаем редирект на поле формы либо на эту запись
 			global $redirect_page;
-		    $redirect_page = isset($submission->get_posted_data()['redirect']) ? $submission->get_posted_data()['redirect'] : get_permalink($consultation_page_id);
+			$redirect_page = isset( $submission->get_posted_data()['redirect'] ) ? $submission->get_posted_data()['redirect'] : get_permalink( $consultation_page_id );
 
-			wp_insert_comment( [ 'user_id' => get_current_user_id(), 'comment_post_ID' => $consultation_page_id, 'comment_content' => $post ] );
+			wp_insert_comment( [ 'user_id'         => get_current_user_id(),
+			                     'comment_post_ID' => $consultation_page_id,
+			                     'comment_content' => $post
+			] );
 			do_action( 'Lt\PostCreated', wp_get_current_user(), $consultation_page_id );
 		}
 	}
 
 	/**
-     * Срабатываем после заполнения формы - добавляет поле redirect в json ответа
-     * После этого идет переадресация на этот урл в ф-и redirect_cf7
+	 * Срабатываем после заполнения формы - добавляет поле redirect в json ответа
+	 * После этого идет переадресация на этот урл в ф-и redirect_cf7
+	 *
 	 * @param $response
 	 *
 	 * @return mixed|void
@@ -104,23 +108,23 @@ class ContactForm {
 			$response['redirect'] = $redirect_page;
 		}
 
-		return apply_filters('Lt\Options\formfill',$response);
+		return apply_filters( 'Lt\Options\formfill', $response );
 	}
 
 	/**
-     * Добавляется в тело страницы
+	 * Добавляется в тело страницы
 	 * Выполняет переадресацию по адресу из параметра redirect, возвращаемому после заполнении формы
-     * см. ф-ю inject_redirect
+	 * см. ф-ю inject_redirect
 	 */
 	function redirect_cf7() {
 		?>
         <script type="text/javascript">
-	var fun = function (event) {
+            var fun = function (event) {
                 if (typeof event.detail.apiResponse.redirect === 'undefined') return;
                 window.location = event.detail.apiResponse.redirect;
             }
             document.addEventListener('wpcf7mailsent', fun, false);
-	    document.addEventListener('wpcf7mailfailed', fun, false);
+            document.addEventListener('wpcf7mailfailed', fun, false);
         </script>
 		<?php
 	}
