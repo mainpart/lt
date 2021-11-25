@@ -54,6 +54,7 @@ class Plugin
 	    add_action('init', array('Lt\PostType', 'init'));
 	    add_action('init', array('Lt\Users', 'init'));
 		add_action('init', array('Lt\Amelia', 'init'));
+
    	    add_action('init', ['Lt\ContactForm', 'init']);
    	    add_action('init', ['Lt\Redirects', 'init']);
 	    add_action('init', ['Lt\Payment', 'init']);

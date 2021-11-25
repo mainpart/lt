@@ -22,6 +22,7 @@ class ComposerStaticInit2220e7d16862dfa99e8bef765976ce57
 
     public static $classMap = array (
         'Lt\\Amelia' => __DIR__ . '/../..' . '/src/Amelia.php',
+        'Lt\\CommentMailPro' => __DIR__ . '/../..' . '/src/CommentMailPro.php',
         'Lt\\ContactForm' => __DIR__ . '/../..' . '/src/ContactForm.php',
         'Lt\\Payment' => __DIR__ . '/../..' . '/src/Payment.php',
         'Lt\\PostType' => __DIR__ . '/../..' . '/src/PostType.php',

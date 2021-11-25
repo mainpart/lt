@@ -92,36 +92,36 @@ class Payment {
 			return;
 		}
 		//file_put_contents(__DIR__."/debug.txt", var_export($_POST,true), FILE_APPEND);
-		        /*
-			$user = wp_get_current_user();
+		/*
+	$user = wp_get_current_user();
 
 
-			$option = get_option( Settings::$option_prefix . '_payments_options' );
-			if ( isset( $option['match'] ) && is_array( $option['match'] ) ) {
-				foreach ( $option['match'] as $key => $value ) {
-					if ( $value['amount'] == $_GET['withdraw_amount'] ) {
-						$dt = Settings::parse_date_time(
-							$value['timevalue'],
-							$value['timespan'],
-							false );
-						if ( ! $dt ) {
-							continue;
-						}
-
-						$start = new \DateTime();
-						$paidfrom = $start->getTimestamp();
-						update_user_meta( $user->ID, 'paidfrom', $paidfrom );
-						$paidto = $start->add( new \DateInterval( $dt ) )->getTimestamp();
-						update_user_meta( $user->ID, 'paidto', $paidto );
-						do_action( 'Lt\PaidChange', $user->ID, $paidfrom, $paidto );
-
-
-					}
-
+	$option = get_option( Settings::$option_prefix . '_payments_options' );
+	if ( isset( $option['match'] ) && is_array( $option['match'] ) ) {
+		foreach ( $option['match'] as $key => $value ) {
+			if ( $value['amount'] == $_GET['withdraw_amount'] ) {
+				$dt = Settings::parse_date_time(
+					$value['timevalue'],
+					$value['timespan'],
+					false );
+				if ( ! $dt ) {
+					continue;
 				}
+
+				$start = new \DateTime();
+				$paidfrom = $start->getTimestamp();
+				update_user_meta( $user->ID, 'paidfrom', $paidfrom );
+				$paidto = $start->add( new \DateInterval( $dt ) )->getTimestamp();
+				update_user_meta( $user->ID, 'paidto', $paidto );
+				do_action( 'Lt\PaidChange', $user->ID, $paidfrom, $paidto );
+
+
 			}
-			die($start->format('c'));
-			*/
+
+		}
+	}
+	die($start->format('c'));
+	*/
 		// получаем id админа
 		$ids = get_users( [ 'role' => 'Administrator' ] );
 		if ( count( $ids ) ) {
@@ -158,7 +158,7 @@ class Payment {
 							continue;
 						}
 
-						$start = new \DateTime();
+						$start    = new \DateTime();
 						$paidfrom = $start->getTimestamp();
 						update_user_meta( $user->ID, 'paidfrom', $paidfrom );
 						$paidto = $start->add( new \DateInterval( $dt ) )->getTimestamp();
@@ -172,7 +172,7 @@ class Payment {
 			}
 
 		}
-                header("HTTP/1.1 200 OK");
+		header( "HTTP/1.1 200 OK" );
 		die( 200 );
 
 	}

@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Lt\\Amelia' => $baseDir . '/src/Amelia.php',
+    'Lt\\CommentMailPro' => $baseDir . '/src/CommentMailPro.php',
     'Lt\\ContactForm' => $baseDir . '/src/ContactForm.php',
     'Lt\\Payment' => $baseDir . '/src/Payment.php',
     'Lt\\PostType' => $baseDir . '/src/PostType.php',

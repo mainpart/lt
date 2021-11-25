@@ -78,6 +78,8 @@ class ContactForm {
 				'post_status' => 'publish',
 			] );
 			update_post_meta( $consultation_page_id, 'client_id', $author_id );
+			// вставляем секцию с comments mail pro
+			do_action( 'Lt\PostCreated', wp_get_current_user(), $consultation_page_id );
 		}
 		// пишем комментарий клиента в эту запись
 		if ( $consultation_page_id ) {
@@ -86,11 +88,12 @@ class ContactForm {
 			global $redirect_page;
 			$redirect_page = isset( $submission->get_posted_data()['redirect'] ) ? $submission->get_posted_data()['redirect'] : get_permalink( $consultation_page_id );
 
-			wp_insert_comment( [ 'user_id'         => get_current_user_id(),
-			                     'comment_post_ID' => $consultation_page_id,
-			                     'comment_content' => $post
+			wp_insert_comment( [
+				'user_id'         => get_current_user_id(),
+				'comment_post_ID' => $consultation_page_id,
+				'comment_content' => $post
 			] );
-			do_action( 'Lt\PostCreated', wp_get_current_user(), $consultation_page_id );
+			do_action( 'Lt\PostUpdated', wp_get_current_user(), $consultation_page_id );
 		}
 	}
 
