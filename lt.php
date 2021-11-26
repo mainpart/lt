@@ -8,7 +8,7 @@
    GitHub Plugin URI: https://github.com/mainpart/lt
    Primary Branch: main
    Domain Path: /languages
-   Version: 1.0.3
+   Version: 1.0.4
    Description: Плагин для организации консультаций
 */
 
@@ -29,7 +29,7 @@ include_once __DIR__ . '/vendor/autoload.php';
 \WP_Dependency_Installer::instance( __DIR__ )->run();
 
 class Plugin {
-	public static bool $initiated = false;
+	public static $initiated = false;
     public static function init() {
 	    if ( ! self::$initiated ) {
 		    // Const for path root
