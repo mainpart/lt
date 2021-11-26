@@ -7,15 +7,16 @@ class Settings {
 	public static $option_prefix = 'lt';
 	private static $initiated = false;
 
-
+    public static function enqueue_scripts_styles(){
+	    wp_enqueue_script( 'lt_dupeable', LT_URL . 'assets/dupeable.js', array( 'jquery' ) );
+    }
 	public static function init() {
 		if ( ! self::$initiated ) {
 			self::$initiated = true;
 			add_action( 'admin_menu', [ self::class, 'add_page' ] );
 			add_action( 'admin_init', [ self::class, 'dbi_register_settings' ] );
 			add_action( 'admin_init', [ 'Lt\Settings\Payments', 'dbi_register_settings' ] );
-			wp_enqueue_script( 'lt_dupeable', LT_URL . 'assets/dupeable.js', array( 'jquery' ) );
-
+            add_action('wp_enqueue_scripts', [self::class, 'enqueue_scripts_styles']);
 		}
 
 	}

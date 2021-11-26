@@ -10,7 +10,7 @@ class PostType {
 	public static function init() {
 		if ( ! self::$initiated ) {
 			self::$initiated = true;
-			add_action( 'wp_loaded', [ self::class, 'register_post_type' ] );
+			add_action( 'init', [ self::class, 'register_post_type' ] );
 			add_filter( 'posts_results', [ self::class, 'posts_results' ] );
 			add_filter( 'the_comments', [ self::class, 'the_comments' ] );
 		}
@@ -54,10 +54,10 @@ class PostType {
 		foreach ( $posts as $idx => $post ) {
 			if ( in_array( $post->post_type, [ self::POST_TYPE ] ) ) {
 				$user = wp_get_current_user();
-				if (Users::user_is('homeopath') ||  current_user_can( 'manage_options' )) {
+				if ( Users::user_is( 'homeopath' ) || current_user_can( 'manage_options' ) ) {
 					continue;
 				}
-				if ( ! Users::is_active( $user->ID ) || $post->post_author !=$user->ID  ) {
+				if ( ! Users::is_active( $user->ID ) || $post->post_author != $user->ID ) {
 					unset( $posts[ $idx ] );
 				}
 			}

@@ -40,5 +40,3 @@ class CommentMailPro {
 	}
 
 }
-
-add_action( 'init', array( __NAMESPACE__ . '\\' . __CLASS__, 'init' ) );

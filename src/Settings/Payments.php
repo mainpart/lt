@@ -8,7 +8,7 @@ use Lt\Settings;
 
 class Payments {
 
-	public function dbi_register_settings() {
+	public static function dbi_register_settings() {
 		register_setting( Settings::$option_prefix . '_payments_match_group', Settings::$option_prefix . '_payments_options' );
 		add_settings_section( 'payment_options_section', 'Общие настройки платежей', null, 'payment' );
 		add_settings_field( Settings::$option_prefix . '_payments_array', 'Настройки оплаты', [

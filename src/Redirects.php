@@ -26,7 +26,7 @@ class Redirects {
 	 *
 	 * @return mixed
 	 */
-	public function fix_allowed( $arr ) {
+	public static function fix_allowed( $arr ) {
 		$options = get_option( 'lt_plugin_options_redirects', true );
 
 		foreach ( (array) $options as $value ) {
@@ -52,7 +52,7 @@ class Redirects {
 	 *
 	 * @return mixed
 	 */
-	function login( $redirect_to, $request, $user ) {
+	public static function login( $redirect_to, $request, $user ) {
 
 		//is there a user to check?
 

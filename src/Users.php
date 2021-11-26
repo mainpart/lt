@@ -298,6 +298,4 @@ class Users {
 
 	}
 
-
 }
-

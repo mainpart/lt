@@ -3,7 +3,7 @@
     "name": "Codestar/codestar-framework",
     "host": "github",
     "slug": "codestar-framework/codestar-framework.php",
-    "uri": "Codestar/codestar-framework",
+    "uri": "mainpart/codestar-framework",
     "branch": "master",
     "required": false
   },
