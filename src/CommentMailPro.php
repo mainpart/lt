@@ -10,7 +10,7 @@ class CommentMailPro {
 	public static function init() {
 		if ( ! self::$initiated ) {
 
-			add_filter( 'Plugin::setup_options', [ self::class, 'remove_subs_for_subscriber' ] );
+			add_filter( 'WebSharks\CommentMail\Pro\Plugin::setup_options', [ self::class, 'remove_subs_for_subscriber' ] );
 			add_action( 'Lt\PostCreated', [ self::class, 'subscribe_user' ], 10, 2 );
 
 		}
