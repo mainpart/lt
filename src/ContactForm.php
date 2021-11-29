@@ -119,7 +119,7 @@ class ContactForm {
 	 * Выполняет переадресацию по адресу из параметра redirect, возвращаемому после заполнении формы
 	 * см. ф-ю inject_redirect
 	 */
-	function redirect_cf7() {
+	static function redirect_cf7() {
 		?>
         <script type="text/javascript">
             var fun = function (event) {

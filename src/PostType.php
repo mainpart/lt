@@ -71,7 +71,7 @@ class PostType {
 	/**
 	 * Фильтрация комментариев чтобы никто не видел чужие
 	 */
-	public function the_comments( $comments ) {
+	public static function the_comments( $comments ) {
 
 		foreach ( $comments as $idx => $comment ) {
 

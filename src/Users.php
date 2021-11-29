@@ -44,7 +44,7 @@ class Users {
 	 * @param $subject string
 	 * @param $body string
 	 */
-	private function send_mail( $user, $subject, $body ) {
+	private static function send_mail( $user, $subject, $body ) {
 		if ( ! $subject || ! $body ) {
 			return;
 		}
@@ -63,7 +63,7 @@ class Users {
 	 *
 	 * @param $user_id
 	 */
-	function notify_user( $user_id ) {
+	static function notify_user( $user_id ) {
 
 		$from = (int) get_user_meta( $user_id, 'paidfrom', true );
 		$to   = (int) get_user_meta( $user_id, 'paidto', true );
@@ -103,7 +103,7 @@ class Users {
 	 * @param $paidto int timestamp
 	 * @param $user_id int
 	 */
-	function paid_change( $user_id, $paidfrom, $paidto ) {
+	static function paid_change( $user_id, $paidfrom, $paidto ) {
 		// нужно убрать старый крон
 		while ( $time_schedule = wp_next_scheduled( 'Lt\Notify', $user_id ) ) {
 			wp_unschedule_event( $time_schedule, 'Lt\Notify', $user_id );
