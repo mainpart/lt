@@ -14,7 +14,7 @@ class Redirects {
 			self::$initiated = true;
 			add_filter( 'login_redirect', [ self::class, 'login' ], 10, 3 );
 			add_filter( 'allowed_redirect_hosts', [ self::class, 'fix_allowed' ], 9999 );
-
+			add_action( 'user_register', [self::class, 'auto_login_new_user'] );
 		}
 
 	}
@@ -42,6 +42,15 @@ class Redirects {
 
 	}
 
+	public static function auto_login_new_user( $user_id ) {
+		/** @var \WP_User $user */
+		$user  = get_user_by('id', $user_id);
+		if (!empty($user->user_activation_key)) return;
+		wp_set_current_user($user_id);
+		wp_set_auth_cookie($user_id);
+		wp_redirect( apply_filters('login_redirect', home_url('/'), home_url('/'), $user) ); // You can change home_url() to the specific URL,such as "wp_redirect( 'http://www.wpcoke.com' )";
+		exit();
+	}
 
 	/**
 	 * Редирект после логина
