@@ -29,32 +29,32 @@ class Settings {
 		] );
 	}
 
-	function dbi_plugin_subscribe_text() {
+	static function dbi_plugin_subscribe_text() {
 		echo '<p>Здесь задаются настройки для подписок</p>';
 	}
 
-	function dbi_plugin_redirects_text() {
+	static function dbi_plugin_redirects_text() {
 		echo '<p>Настройки переадресации</p>';
 	}
 
-	function dbi_plugin_redirect_text_active() {
+	static function dbi_plugin_redirect_text_active() {
 		echo '<p>Настройки переадресации для пользователей, которые считаются активными</p>';
 	}
 
-	function dbi_plugin_redirect_text_future() {
+	static function dbi_plugin_redirect_text_future() {
 		echo '<p>Настройки переадресации для пользователей, которые будут активными в дальнейшем</p>';
 	}
 
-	function dbi_plugin_redirect_text_past() {
+	static function dbi_plugin_redirect_text_past() {
 		echo '<p>Настройки переадресации для пользователей, чья дата активности прошла</p>';
 	}
 
-	function dbi_plugin_redirect_text_noinfo() {
+	static function dbi_plugin_redirect_text_noinfo() {
 		echo '<p>Настройки переадресации для пользователей, у которых не проставлена дата активности</p>';
 	}
 
 
-	function dbi_plugin_template_text() {
+	static function dbi_plugin_template_text() {
 		echo '<p>Здесь задаются различные опции шаблонов. В шаблонах в скобочках { } можно использовать любые поля или мета-поля пользователя, такие как user_login, user_pass, user_nicename, user_email, user_url, user_registered, user_activation_key, user_status, display_name и пр</p>';
 	}
 
@@ -94,13 +94,27 @@ class Settings {
 			self::class,
 			'dbi_plugin_setting_redirect_login_future'
 		], 'redirect', 'redirects_options_future' );
+		add_settings_field( self::$option_prefix . '_redirect_postview_future', 'Переадресация при просмотре консультации', [
+			self::class,
+			'dbi_plugin_setting_redirect_postview_future'
+		], 'redirect', 'redirects_options_future' );
+
 		add_settings_field( self::$option_prefix . '_redirect_login_past', 'Переадресация после входа', [
 			self::class,
 			'dbi_plugin_setting_redirect_login_past'
 		], 'redirect', 'redirects_options_past' );
+		add_settings_field( self::$option_prefix . '_redirect_postview_past', 'Переадресация при просмотре консультации', [
+			self::class,
+			'dbi_plugin_setting_redirect_postview_past'
+		], 'redirect', 'redirects_options_past' );
+
 		add_settings_field( self::$option_prefix . '_redirect_login_noinfo', 'Переадресация после входа', [
 			self::class,
 			'dbi_plugin_setting_redirect_login_noinfo'
+		], 'redirect', 'redirects_options_noinfo' );
+		add_settings_field( self::$option_prefix . '_redirect_postview_noinfo', 'Переадресация при просмотре консультации', [
+			self::class,
+			'dbi_plugin_setting_redirect_postview_noinfo'
 		], 'redirect', 'redirects_options_noinfo' );
 
 
@@ -116,6 +130,12 @@ class Settings {
 			self::class,
 			'dbi_plugin_setting_approve_time'
 		], 'timing', 'subscribe_options' );
+
+		add_settings_section( 'template_options_postcontent', 'Тело записи для консультации', null, 'template' );
+		add_settings_field( self::$option_prefix . '_postcontent', 'Содержимое записи ', [
+			self::class,
+			'dbi_plugin_setting_template_postconent'
+		], 'template', 'template_options_postcontent' );
 
 		add_settings_section( 'template_options_start', 'Уведомления о начавшемся доступе', [
 			self::class,
@@ -173,18 +193,30 @@ class Settings {
 		$options = get_option( self::$option_prefix . '_plugin_options_redirects' );
 		echo "<input type='text' name='lt_plugin_options_redirects[login_future]' value='" . esc_attr( isset( $options['login_future'] ) ? $options['login_future'] : '' ) . "' />";
 	}
+	public static function dbi_plugin_setting_redirect_postview_future() {
+		$options = get_option( self::$option_prefix . '_plugin_options_redirects' );
+		echo "<input type='text' name='lt_plugin_options_redirects[postview_future]' value='" . esc_attr( isset( $options['postview_future'] ) ? $options['postview_future'] : '' ) . "' />";
+	}
 
 	public static function dbi_plugin_setting_redirect_login_past() {
 		$options = get_option( self::$option_prefix . '_plugin_options_redirects' );
 		echo "<input type='text' name='lt_plugin_options_redirects[login_past]' value='" . esc_attr( isset( $options['login_past'] ) ? $options['login_past'] : '' ) . "' />";
+	}
+	public static function dbi_plugin_setting_redirect_postview_past() {
+		$options = get_option( self::$option_prefix . '_plugin_options_redirects' );
+		echo "<input type='text' name='lt_plugin_options_redirects[postview_past]' value='" . esc_attr( isset( $options['postview_past'] ) ? $options['postview_past'] : '' ) . "' />";
 	}
 
 	public static function dbi_plugin_setting_redirect_login_noinfo() {
 		$options = get_option( self::$option_prefix . '_plugin_options_redirects' );
 		echo "<input type='text' name='lt_plugin_options_redirects[login_noinfo]' value='" . esc_attr( isset( $options['login_noinfo'] ) ? $options['login_noinfo'] : '' ) . "' />";
 	}
+	public static function dbi_plugin_setting_redirect_postview_noinfo() {
+		$options = get_option( self::$option_prefix . '_plugin_options_redirects' );
+		echo "<input type='text' name='lt_plugin_options_redirects[postview_noinfo]' value='" . esc_attr( isset( $options['postview_noinfo'] ) ? $options['postview_noinfo'] : '' ) . "' />";
+	}
 
-	function dbi_plugin_setting_template_soon() {
+	static function dbi_plugin_setting_template_soon() {
 		?>
         <p><label for="lt_plugin_options_template[template_soon]">Можно использовать макросы {user_name}</label></p>
 		<?php
@@ -192,45 +224,51 @@ class Settings {
 		echo "<textarea name='lt_plugin_options_template[template_soon]' rows='7' cols='50' >" . esc_textarea( isset( $options['template_soon'] ) ? $options['template_soon'] : '' ) . "</textarea>";
 	}
 
-	function dbi_plugin_setting_template_subject_end() {
+	static function dbi_plugin_setting_template_postconent() {
+		$options = get_option( self::$option_prefix . '_plugin_options_template' );
+		echo "<textarea type='text' name='lt_plugin_options_template[postcontent]' rows='7' cols='50' >" . esc_textarea( isset( $options['postcontent'] ) ? $options['postcontent'] : '' ) . "</textarea>";
+	}
+
+
+	static function dbi_plugin_setting_template_subject_end() {
 		$options = get_option( self::$option_prefix . '_plugin_options_template' );
 		echo "<input type='text' name='lt_plugin_options_template[subject_end]' value='" . esc_attr( isset( $options['subject_end'] ) ? $options['subject_end'] : '' ) . "' />";
 	}
 
-	function dbi_plugin_setting_template_subject_soon() {
+	static function dbi_plugin_setting_template_subject_soon() {
 		$options = get_option( self::$option_prefix . '_plugin_options_template' );
 		echo "<input type='text' name='lt_plugin_options_template[subject_soon]' value='" . esc_attr( isset( $options['subject_soon'] ) ? $options['subject_soon'] : '' ) . "' />";
 	}
 
-	function dbi_plugin_setting_template_end() {
+	static function dbi_plugin_setting_template_end() {
 		$options = get_option( self::$option_prefix . '_plugin_options_template' );
 		echo "<textarea name='lt_plugin_options_template[template_end]' rows='7' cols='50'>" . esc_textarea( isset( $options['template_end'] ) ? $options['template_end'] : '' ) . "</textarea>";
 	}
 
-	function dbi_plugin_setting_template_subject_start() {
+	static function dbi_plugin_setting_template_subject_start() {
 		$options = get_option( self::$option_prefix . '_plugin_options_template' );
 		echo "<input type='text' name='lt_plugin_options_template[subject_start]' value='" . esc_attr( isset( $options['subject_start'] ) ? $options['subject_start'] : '' ) . "' />";
 	}
 
-	function dbi_plugin_setting_template_start() {
+	static function dbi_plugin_setting_template_start() {
 		$options = get_option( self::$option_prefix . '_plugin_options_template' );
 		echo "<textarea name='lt_plugin_options_template[template_start]' rows='7' cols='50'>" . esc_textarea( isset( $options['template_start'] ) ? $options['template_start'] : '' ) . "</textarea>";
 	}
 
 
-	function dbi_plugin_setting_template_soon_time() {
+	static function dbi_plugin_setting_template_soon_time() {
 		self::make_select( self::$option_prefix . '_plugin_options_template', 'endsoon_timevalue', 'endsoon_timespan' );
 	}
-//	function dbi_plugin_setting_template_end_time() {
+//	static function dbi_plugin_setting_template_end_time() {
 //		self::make_select( self::$option_prefix . '_plugin_options_template', 'end_timevalue', 'end_timespan' );
 //	}
 
 
-	function dbi_plugin_setting_register_time() {
+	static function dbi_plugin_setting_register_time() {
 		self::make_select( self::$option_prefix . '_plugin_options_timing', 'registration_timevalue', 'registration_timespan' );
 	}
 
-	function dbi_plugin_setting_approve_time() {
+	static function dbi_plugin_setting_approve_time() {
 		self::make_select( self::$option_prefix . '_plugin_options_timing', 'approve_timevalue', 'approve_timespan' );
 	}
 
@@ -284,7 +322,7 @@ class Settings {
                 <a href="?page=lt_options&tab=timing"
                    class="nav-tab <?php echo $active_tab == 'timing' ? 'nav-tab-active' : ''; ?>">Время доступа</a>
                 <a href="?page=lt_options&tab=template"
-                   class="nav-tab <?php echo $active_tab == 'template' ? 'nav-tab-active' : ''; ?>">Уведомления</a>
+                   class="nav-tab <?php echo $active_tab == 'template' ? 'nav-tab-active' : ''; ?>">Уведомления и шаблоны</a>
                 <a href="?page=lt_options&tab=redirect"
                    class="nav-tab <?php echo $active_tab == 'redirect' ? 'nav-tab-active' : ''; ?>">Переадресации</a>
                 <a href="?page=lt_options&tab=payment"

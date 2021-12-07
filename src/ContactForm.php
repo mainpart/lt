@@ -71,14 +71,19 @@ class ContactForm {
 		if ( $query->have_posts() ) {
 			$consultation_page_id = $query->posts[0]->ID;
 		} else {
+			$postcontent = get_option( Settings::$option_prefix . '_plugin_options_template', true );
 			$consultation_page_id = wp_insert_post( [
 				'post_author' => $author_id,
 				'post_title'  => $contact_form->title() . " " . $user->user_login,
 				'post_type'   => PostType::POST_TYPE,
 				'post_status' => 'publish',
+                'post_content' => $postcontent['postcontent'],
 			] );
 			update_post_meta( $consultation_page_id, 'client_id', $author_id );
-			// вставляем секцию с comments mail pro
+			// если подписчик создает свой первый пост, то дата его членства стартует с указанной даты
+            if (Users::user_is('subscriber', $user)) {
+                Users::set_initial_access($user->ID);
+            }
 			do_action( 'Lt\PostCreated', wp_get_current_user(), $consultation_page_id );
 		}
 		// пишем комментарий клиента в эту запись

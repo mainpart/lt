@@ -10,13 +10,21 @@ class CommentMailPro {
 	public static function init() {
 		if ( ! self::$initiated ) {
 
-			add_filter( 'WebSharks\CommentMail\Pro\Plugin::setup_options', [ self::class, 'remove_subs_for_subscriber' ] );
+			//add_filter( 'WebSharks\CommentMail\Pro\Plugin::setup_options', [ self::class, 'remove_subs_for_subscriber' ] );
 			add_action( 'Lt\PostCreated', [ self::class, 'subscribe_user' ], 10, 2 );
+			add_action('wp_enqueue_scripts',[self::class, 'remove_comment_mail']);
 
 		}
 
 	}
+	public static function remove_comment_mail(){
+		$inline_js = array(
+			'is_subscriber'=>(bool)Users::user_is('subscriber')
+		);
+		wp_enqueue_script('commentmail', LT_URL . 'assets/commentmail.js', ['jquery']);
+		wp_localize_script( 'commentmail', 'cminline', $inline_js );
 
+	}
 	// подписываем пользователя на только что созданный пост
 	public static function subscribe_user( $user, $post_id ) {
 		global $wpdb;
@@ -32,7 +40,7 @@ class CommentMailPro {
 		if ( isset( $options['comment_form_sub_template_enable'] ) ) {
 			$user = wp_get_current_user();
 			if ( $user->exists() && Users::user_is( 'subscriber' ) ) {
-				$options['comment_form_sub_template_enable'] = false;
+				$options['comment_form_sub_template_enable'] = '0';
 			}
 		}
 

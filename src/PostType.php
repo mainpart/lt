@@ -13,10 +13,41 @@ class PostType {
 			add_action( 'init', [ self::class, 'register_post_type' ] );
 			add_filter( 'posts_results', [ self::class, 'posts_results' ] );
 			add_filter( 'the_comments', [ self::class, 'the_comments' ] );
+			add_action( 'template_redirect', [self::class, 'template_redirect'] );
+
 		}
 
 	}
+	public static function template_redirect(){
+		$obj = get_queried_object();
+		if ($obj instanceof \WP_Post && $obj->post_type == self::POST_TYPE) {
+			$user = wp_get_current_user();
+			if (!$user->exists()) return;
+			if (Users::is_active($user->ID)) return;
+			$options = get_option( 'lt_plugin_options_redirects', true );
+			switch ( true ) {
+				case Users::is_future( $user->ID ) && ! empty( $options['postview_future'] ) :
+					if ( ! empty( $options['postview_future'] ) ) {
+						wp_redirect($options['postview_future']);
+						exit();
+					}
+					break;
+				case Users::is_past( $user->ID ) && ! empty( $options['postview_past'] ):
+					if ( ! empty( $options['postview_past'] ) ) {
+						wp_redirect($options['postview_past']);
+						exit();
+					}
+					break;
+				case Users::is_noset( $user->ID ) && ! empty( $options['postview_noinfo'] ):
+					if ( ! empty( $options['postview_noinfo'] ) ) {
+						wp_redirect($options['postview_noinfo']);
+						exit();
+					}
+					break;
 
+			}
+		}
+	}
 	public static function register_post_type() {
 		register_post_type( self::POST_TYPE,
 			array(

@@ -5,11 +5,27 @@ namespace Lt;
 
 
 class ShortCode {
-
+	/**
+	 * Обрабатывает шоткод [userrole role="homeopath,subscriber,..." status="active,past,future,noset"] содержимое [/userrole]
+	 * @param $atts
+	 * @param null $content
+	 *
+	 * @return string
+	 */
 	function shortcode( $atts, $content = null ) {
 		$user = wp_get_current_user();
 		if ( $atts['role'] && is_array( $user->roles ) && count( array_intersect( preg_split( '/[\ \n\,]+/', $atts['role'], - 1, PREG_SPLIT_NO_EMPTY ), $user->roles ) ) > 0 ) {
-			return $content;
+			$status_arr = preg_split( '/[\ \n\,]+/', $atts['status'], - 1, PREG_SPLIT_NO_EMPTY );
+			switch ( true ) {
+				case in_array( "active", $status_arr ) && Users::is_active( $user->ID ):
+				case in_array( "past", $status_arr ) && Users::is_past( $user->ID ):
+				case in_array( "future", $status_arr ) && Users::is_future( $user->ID ):
+				case in_array( "noset", $status_arr ) && Users::is_noset( $user->ID ):
+				case count( $status_arr ) == 0:
+					return $content;
+				default:
+					return "";
+			}
 		}
 
 		return "";

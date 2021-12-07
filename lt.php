@@ -8,7 +8,7 @@
    GitHub Plugin URI: https://github.com/mainpart/lt
    Primary Branch: main
    Domain Path: /languages
-   Version: 1.0.8
+   Version: 1.0.11
    Description: Плагин для организации консультаций
 */
 
@@ -37,7 +37,6 @@ class Plugin {
 			    define( 'LT_LOCALE', get_locale() );
 		    }
 		    load_plugin_textdomain( 'lt', false, plugin_basename( __DIR__ ) . '/languages/' );
-			add_action('wp_enqueue_scripts', array(self::class, 'enqueue_scripts_styles'));
 
 
 		    add_action('plugins_loaded', array('Lt\Settings', 'init'));
@@ -53,17 +52,6 @@ class Plugin {
 		    self::$initiated = true;
 	    }
     }
-	public static function enqueue_scripts_styles(){
-		wp_register_script( 'jquerydaterange', LT_URL . 'vendor/jquery-ui-daterangepicker/jquery.comiseo.daterangepicker.js', [
-			'jquery',
-			'jquery-ui-button',
-			'jquery-ui-menu',
-			'jquery-ui-datepicker',
-			'moment'
-		] );
-		wp_register_style( 'jquerydaterange', LT_URL . 'vendor/jquery-ui-daterangepicker/jquery.comiseo.daterangepicker.css' );
-
-	}
 
 }
 

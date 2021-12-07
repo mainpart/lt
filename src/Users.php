@@ -16,9 +16,10 @@ class Users {
 			add_filter( 'manage_users_custom_column', [ 'Lt\Users', 'new_modify_user_table_row' ], 10, 3 );
 			add_filter( 'manage_users_columns', [ 'LT\Users', 'new_modify_user_table' ] );
 			add_action( 'wp_ajax_change_userdate_admin_ajax', array( 'Lt\Users', 'consult_change_date_admin_ajax' ) );
-			add_action( 'admin_enqueue_scripts', array( 'Lt\Users', 'admin_enqueue_scripts' ), 10, 1 );
-			add_action( 'user_register', [ self::class, 'user_register' ] );
-			add_action( 'Lt\PaidChange', [ self::class, 'paid_change' ], 10, 3 );
+			add_action( 'admin_enqueue_scripts', [self::class, 'admin_enqueue_scripts' ]);
+			add_action( 'user_register', [ self::class, 'set_initial_access' ] );
+			add_action( 'Lt\PaidChange', [ self::class, 'schedule_notification' ], 10, 3 );
+			add_action( 'Lt\PaidChange', [ self::class, 'change_subscribe_status' ], 10, 1);
 			add_action( 'Lt\Notify', [ self::class, 'notify_user' ] );
 			add_action( 'af/form/editing/user_created', [ self::class, 'form_sign_in_user' ], 10, 1 );
 
@@ -92,9 +93,18 @@ class Users {
 			$options = get_option( Settings::$option_prefix . '_plugin_options_template' );
 			self::send_mail( $user, $options['subject_end'], $options['template_end'] );
 		}
+		// в дополнение меняем статус подписки пользователя когда заканчивается время подписки
+		self::change_subscribe_status($user_id);
 
 	}
-
+	static function change_subscribe_status($user_id) {
+		global $wpdb;
+		if (Users::is_active($user_id)) {
+			$wpdb->update($wpdb->prefix.'comment_mail_subs', ['status'=>'subscribed'], ['user_id'=>$user_id]);
+		} elseif (Users::is_past($user_id) || Users::is_future($user_id)) {
+			$wpdb->update($wpdb->prefix.'comment_mail_subs', ['status'=>'trashed'], ['user_id'=>$user_id]);
+		}
+	}
 	/**
 	 * Хук вызывается когда прописывается дата начала и окончания платежа у клиента
 	 * Устанавливает вызов функции уведомления об окончании доступа за 1 день и в момент окончания
@@ -103,15 +113,16 @@ class Users {
 	 * @param $paidto int timestamp
 	 * @param $user_id int
 	 */
-	static function paid_change( $user_id, $paidfrom, $paidto ) {
+	static function schedule_notification( $user_id, $paidfrom, $paidto ) {
 		// нужно убрать старый крон
 		while ( $time_schedule = wp_next_scheduled( 'Lt\Notify', $user_id ) ) {
 			wp_unschedule_event( $time_schedule, 'Lt\Notify', $user_id );
 		}
-		// за три дня до окончания доступа оповещаем пользователя
+		// за три дня до начала доступа оповещаем пользователя
 		if ( $paidfrom ) {
-			wp_schedule_single_event( $paidfrom, '\Lt\Notify', $user_id );
+			wp_schedule_single_event( $paidfrom, 'Lt\Notify', $user_id );
 		}
+		// за определенную дату до окончания подписки предупреждаем
 		if ( $paidto ) {
 			$end     = DateTime::createFromFormat( "U", $paidto );
 			$options = get_option( Settings::$option_prefix . '_plugin_options_template', true );
@@ -122,7 +133,7 @@ class Users {
 					'P1D' )
 			) )->getTimestamp(), 'Lt\Notify', $user_id );
 			// в час окончания доступа
-			wp_schedule_single_event( $paidto, '\Lt\Notify', $user_id );
+			wp_schedule_single_event( $paidto, 'Lt\Notify', $user_id );
 		}
 	}
 
@@ -133,12 +144,7 @@ class Users {
 	 * @param $user_id
 	 *
 	 */
-	public static function user_register( $user_id ) {
-		$user = new \WP_User( $user_id );
-		// доступ предоставляется только подписчикам
-		if ( ! Users::user_is( 'subscriber', $user ) ) {
-			return;
-		}
+	public static function set_initial_access( $user_id ) {
 		$start   = new DateTime();
 		$options = get_option( Settings::$option_prefix . '_plugin_options_timing', true );
 		update_user_meta( $user_id, 'paidfrom', $paidfrom = $start->setTime( 0, 0, 0 )->getTimestamp() );
@@ -154,6 +160,16 @@ class Users {
 		do_action( 'Lt\PaidChange', $user_id, null, $paidto );
 	}
 
+
+	public static function has_post($user){
+		$query = new \WP_Query( [
+			'author'      => $user->ID,
+			'post_type'   => PostType::POST_TYPE,
+			'post_status' => [ 'publish' ],
+		] );
+
+		return $query->post_count != 0;
+	}
 	/**
 	 * Смотрит на unix-timestamp мета-поля  paidfrom / paidto и вычисляет статус активности пользователя
 	 *
@@ -162,6 +178,12 @@ class Users {
 	 * @return bool
 	 */
 	public static function is_active( $user_id ) {
+
+		if ($user = get_user_by('id', $user_id)) {
+			if (Users::user_is('subscriber', $user) && ! Users::has_post($user)) {
+				return true;
+			}
+		}
 		$from_unixtime = get_user_meta( $user_id, 'paidfrom', true );
 		$to_unixtime   = get_user_meta( $user_id, 'paidto', true );
 		switch ( true ) {
@@ -173,6 +195,7 @@ class Users {
 	}
 
 	public static function is_past( $user_id ) {
+
 		$to_unixtime = get_user_meta( $user_id, 'paidto', true );
 		switch ( true ) {
 			case ! empty( $to_unixtime ) && time() > $to_unixtime:
@@ -231,9 +254,9 @@ class Users {
 			case 'access' :
 				$paidfrom       = get_user_meta( $user_id, 'paidfrom', true );
 				$paidto         = get_user_meta( $user_id, 'paidto', true );
-				$date_time_from = ( new DateTime() )->setTimestamp( $paidfrom )->format( 'c' );
-				$date_time_to   = ( new DateTime() )->setTimestamp( $paidto )->format( 'c' );
-				$val            = "<div class='paidtill_{$user_id}' data-user-id='{$user_id}'><span class='paidtill'><input data-to='" . esc_attr( $date_time_to ) . "' data-from='" . esc_attr( $date_time_from ) . "' class='paidtill' name='paidtill[{$user_id}]' type='hidden' /></span></div>";
+				$date_time_from = $paidfrom ? ( new DateTime() )->setTimestamp( $paidfrom )->format( 'c' ) : '';
+				$date_time_to   = $paidto ? ( new DateTime() )->setTimestamp( $paidto )->format( 'c' ) :'';
+				$val            = empty($paidfrom) || empty($paidto) ? "Не установлено" : "<div class='paidtill_{$user_id}' data-user-id='{$user_id}'><span class='paidtill'><input data-to='" . esc_attr( $date_time_to ) . "' data-from='" . esc_attr( $date_time_from ) . "' class='paidtill' name='paidtill[{$user_id}]' type='hidden' /></span></div>";
 				break;
 			default:
 		}
@@ -272,11 +295,22 @@ class Users {
 	}
 
 	public static function admin_enqueue_scripts( $hook ) {
-		global $pagenow, $typenow;
+		global $pagenow;
 
 		if ( $pagenow == 'users.php' ) {
 
 			$wp_scripts = wp_scripts();
+
+			wp_register_script( 'jquerydaterange', LT_URL . 'vendor/jquery-ui-daterangepicker/jquery.comiseo.daterangepicker.js', [
+				'jquery',
+				'jquery-ui-button',
+				'jquery-ui-menu',
+				'jquery-ui-datepicker',
+				'moment'
+			] );
+			wp_register_style( 'jquerydaterange', LT_URL . 'vendor/jquery-ui-daterangepicker/jquery.comiseo.daterangepicker.css' );
+
+
 			wp_enqueue_style( 'plugin_name-admin-ui-css',
 				'//ajax.googleapis.com/ajax/libs/jqueryui/' . $wp_scripts->registered['jquery-ui-core']->ver . '/themes/smoothness/jquery-ui.css',
 				false,

@@ -48,8 +48,7 @@ class Redirects {
 		if (!empty($user->user_activation_key)) return;
 		wp_set_current_user($user_id);
 		wp_set_auth_cookie($user_id);
-		wp_redirect( apply_filters('login_redirect', home_url('/'), home_url('/'), $user) ); // You can change home_url() to the specific URL,such as "wp_redirect( 'http://www.wpcoke.com' )";
-		exit();
+		do_action( 'wp_login', $user->user_login , $user );
 	}
 
 	/**
