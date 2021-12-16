@@ -27,23 +27,14 @@ class PostType {
 			$options = get_option( 'lt_plugin_options_redirects', true );
 			switch ( true ) {
 				case Users::is_future( $user->ID ) && ! empty( $options['postview_future'] ) :
-					if ( ! empty( $options['postview_future'] ) ) {
 						wp_redirect($options['postview_future']);
 						exit();
-					}
-					break;
 				case Users::is_past( $user->ID ) && ! empty( $options['postview_past'] ):
-					if ( ! empty( $options['postview_past'] ) ) {
 						wp_redirect($options['postview_past']);
 						exit();
-					}
-					break;
 				case Users::is_noset( $user->ID ) && ! empty( $options['postview_noinfo'] ):
-					if ( ! empty( $options['postview_noinfo'] ) ) {
 						wp_redirect($options['postview_noinfo']);
 						exit();
-					}
-					break;
 
 			}
 		}
@@ -88,7 +79,7 @@ class PostType {
 				if ( Users::user_is( 'homeopath' ) || current_user_can( 'manage_options' ) ) {
 					continue;
 				}
-				if ( ! Users::is_active( $user->ID ) || $post->post_author != $user->ID ) {
+				if ( $post->post_author != $user->ID ) {
 					unset( $posts[ $idx ] );
 				}
 			}

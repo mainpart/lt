@@ -19,18 +19,22 @@ class Users {
 			add_action( 'admin_enqueue_scripts', [self::class, 'admin_enqueue_scripts' ]);
 			add_action( 'user_register', [ self::class, 'set_initial_access' ] );
 			add_action( 'Lt\PaidChange', [ self::class, 'schedule_notification' ], 10, 3 );
-			add_action( 'Lt\PaidChange', [ self::class, 'change_subscribe_status' ], 10, 1);
+			add_action( 'Lt\PaidChange', [ self::class, 'change_subscribe_status' ], 100, 1);
 			add_action( 'Lt\Notify', [ self::class, 'notify_user' ] );
 			add_action( 'af/form/editing/user_created', [ self::class, 'form_sign_in_user' ], 10, 1 );
-
+			add_action('af/form/validate', [self::class,'validate']);
 		}
 
 
 	}
+	public static function validate(){
+		$email = af_get_field( 'email' );
+		if (!($email && !get_user_by('email',$email))){
+			af_add_error('email','Пользователь с таким email уже есть');
+		}
 
+	}
 	public static function form_sign_in_user( $user ) {
-		wp_set_auth_cookie( $user->ID );
-
 		clean_user_cache( $user->ID );
 		wp_clear_auth_cookie();
 		wp_set_current_user( $user->ID );
@@ -99,10 +103,11 @@ class Users {
 	}
 	static function change_subscribe_status($user_id) {
 		global $wpdb;
+
 		if (Users::is_active($user_id)) {
 			$wpdb->update($wpdb->prefix.'comment_mail_subs', ['status'=>'subscribed'], ['user_id'=>$user_id]);
 		} elseif (Users::is_past($user_id) || Users::is_future($user_id)) {
-			$wpdb->update($wpdb->prefix.'comment_mail_subs', ['status'=>'trashed'], ['user_id'=>$user_id]);
+			$wpdb->update($wpdb->prefix.'comment_mail_subs', ['status'=>'suspended'], ['user_id'=>$user_id]);
 		}
 	}
 	/**
@@ -155,19 +160,21 @@ class Users {
 				$options['registration_timespan'],
 				'P3D' )
 
-		) )->setTime( 23, 59, 59 )->getTimestamp() );
+		) )/*->setTime( 23, 59, 59 )*/->getTimestamp() );
 		// чтобы не присылать уведомления о начале доступа мы передаем null
 		do_action( 'Lt\PaidChange', $user_id, null, $paidto );
 	}
 
 
 	public static function has_post($user){
+		remove_filter( 'posts_results', [ PostType::class, 'posts_results' ] );
 		$query = new \WP_Query( [
 			'author'      => $user->ID,
 			'post_type'   => PostType::POST_TYPE,
 			'post_status' => [ 'publish' ],
+			'posts_per_page'=>1,
 		] );
-
+		add_filter( 'posts_results', [ PostType::class, 'posts_results' ] );
 		return $query->post_count != 0;
 	}
 	/**
@@ -277,7 +284,7 @@ class Users {
 
 			update_user_meta( $_POST['userid'], 'paidfrom', $from );
 			update_user_meta( $_POST['userid'], 'paidto', $to );
-			do_action( 'Lt\PaidChange', $user->ID, $from, $to );
+			do_action( 'Lt\PaidChange', $_POST['userid'], $from, $to );
 			wp_die( 'ok' );
 		}
 		wp_die( __( 'Access denied', 'lt' ), 403 );

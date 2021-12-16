@@ -14,7 +14,7 @@ class Redirects {
 			self::$initiated = true;
 			add_filter( 'login_redirect', [ self::class, 'login' ], 10, 3 );
 			add_filter( 'allowed_redirect_hosts', [ self::class, 'fix_allowed' ], 9999 );
-			add_action( 'user_register', [self::class, 'auto_login_new_user'] );
+			//add_action( 'user_register', [self::class, 'auto_login_new_user'] );
 		}
 
 	}
@@ -42,14 +42,14 @@ class Redirects {
 
 	}
 
-	public static function auto_login_new_user( $user_id ) {
-		/** @var \WP_User $user */
-		$user  = get_user_by('id', $user_id);
-		if (!empty($user->user_activation_key)) return;
-		wp_set_current_user($user_id);
-		wp_set_auth_cookie($user_id);
-		do_action( 'wp_login', $user->user_login , $user );
-	}
+//	public static function auto_login_new_user( $user_id ) {
+//		/** @var \WP_User $user */
+//		$user  = get_user_by('id', $user_id);
+//		if (!empty($user->user_activation_key)) return;
+//		wp_set_current_user($user_id);
+//		wp_set_auth_cookie($user_id);
+//		do_action( 'wp_login', $user->user_login , $user );
+//	}
 
 	/**
 	 * Редирект после логина
@@ -79,6 +79,7 @@ class Redirects {
 				'author'      => $user->ID,
 				'post_type'   => PostType::POST_TYPE,
 				'post_status' => [ 'publish' ],
+
 			] );
 
 			if ( $query->post_count ) {

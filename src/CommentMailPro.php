@@ -25,13 +25,13 @@ class CommentMailPro {
 		wp_localize_script( 'commentmail', 'cminline', $inline_js );
 
 	}
-	// подписываем пользователя на только что созданный пост
+//	 подписываем пользователя на только что созданный пост
 	public static function subscribe_user( $user, $post_id ) {
 		global $wpdb;
 		if ( $user->exists() ) {
 			$insert = $wpdb->prepare( "(%s, %d, %d, 0, 'asap', %s, %s, %s, 'subscribed', %d)", 'k' . strtolower( substr( md5( time() ), 0, 18 ) ), $user->ID, $post_id,
 				$user->first_name, $user->last_name, $user->user_email, time() );
-			$wpdb->query( "INSERT INTO {$wpdb->base_prefix}comment_mail_subs (`key`, user_id, post_id, comment_id, deliver, fname, lname, email, status,insertion_time) VALUES " . $insert );
+			$wpdb->query( "INSERT INTO {$wpdb->prefix}comment_mail_subs (`key`, user_id, post_id, comment_id, deliver, fname, lname, email, status,insertion_time) VALUES " . $insert );
 		}
 	}
 

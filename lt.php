@@ -2,13 +2,13 @@
 
 /*
    Plugin Name: LifeTutor
-   Author: Dmitry Krasnikov <dmitry.krasnikov@gmail.com>
+   Author: "Dmitry Krasnikov" <dmitry.krasnikov@gmail.com>
    License: GPLv2 or later
    Text Domain: pharma
    GitHub Plugin URI: https://github.com/mainpart/lt
    Primary Branch: main
    Domain Path: /languages
-   Version: 1.0.11
+   Version: 1.0.12
    Description: Плагин для организации консультаций
 */
 
