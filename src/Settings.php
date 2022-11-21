@@ -16,7 +16,7 @@ class Settings {
 			add_action( 'admin_menu', [ self::class, 'add_page' ] );
 			add_action( 'admin_init', [ self::class, 'dbi_register_settings' ] );
 			add_action( 'admin_init', [ 'Lt\Settings\Payments', 'dbi_register_settings' ] );
-            add_action('wp_enqueue_scripts', [self::class, 'enqueue_scripts_styles']);
+         add_action( 'admin_enqueue_scripts', [self::class, 'enqueue_scripts_styles']);
 		}
 
 	}
