@@ -152,7 +152,7 @@ class Users {
 	public static function set_initial_access( $user_id ) {
 		$start   = new DateTime();
 		$options = get_option( Settings::$option_prefix . '_plugin_options_timing', true );
-		update_user_meta( $user_id, 'paidfrom', $paidfrom = $start->setTime( 0, 0, 0 )->getTimestamp() );
+		update_user_meta( $user_id, 'paidfrom', $paidfrom = $start->getTimestamp() );
 		update_user_meta( $user_id, 'paidto', $paidto = $start->add( new \DateInterval(
 
 			Settings::parse_date_time(
@@ -160,7 +160,7 @@ class Users {
 				$options['registration_timespan'],
 				'P3D' )
 
-		) )/*->setTime( 23, 59, 59 )*/->getTimestamp() );
+		) )->getTimestamp() );
 		// чтобы не присылать уведомления о начале доступа мы передаем null
 		do_action( 'Lt\PaidChange', $user_id, null, $paidto );
 	}
@@ -185,6 +185,8 @@ class Users {
 	 * @return bool
 	 */
 	public static function is_active( $user_id ) {
+
+		if (current_user_can('manage_options')) return true;
 
 		if ($user = get_user_by('id', $user_id)) {
 			if (Users::user_is('subscriber', $user) && ! Users::has_post($user)) {
@@ -253,8 +255,7 @@ class Users {
 	 *
 	 * @return mixed|string
 	 */
-	public
-	static function new_modify_user_table_row(
+	public static function new_modify_user_table_row(
 		$val, $column_name, $user_id
 	) {
 		switch ( $column_name ) {
@@ -263,7 +264,7 @@ class Users {
 				$paidto         = get_user_meta( $user_id, 'paidto', true );
 				$date_time_from = $paidfrom ? ( new DateTime() )->setTimestamp( $paidfrom )->format( 'c' ) : '';
 				$date_time_to   = $paidto ? ( new DateTime() )->setTimestamp( $paidto )->format( 'c' ) :'';
-				$val            = empty($paidfrom) || empty($paidto) ? "Не установлено" : "<div class='paidtill_{$user_id}' data-user-id='{$user_id}'><span class='paidtill'><input data-to='" . esc_attr( $date_time_to ) . "' data-from='" . esc_attr( $date_time_from ) . "' class='paidtill' name='paidtill[{$user_id}]' type='hidden' /></span></div>";
+				$val            = "<div class='paidtill_{$user_id}' data-user-id='{$user_id}'><span class='paidtill'><input data-to='" . esc_attr( $date_time_to ) . "' data-from='" . esc_attr( $date_time_from ) . "' class='paidtill' name='paidtill[{$user_id}]' type='hidden' /></span></div>";
 				break;
 			default:
 		}
@@ -274,8 +275,7 @@ class Users {
 	/**
 	 *  Обработчик ajax вызова из админки
 	 */
-	public
-	static function consult_change_date_admin_ajax() {
+	public static function consult_change_date_admin_ajax() {
 		$user = wp_get_current_user();
 		if ( $user && current_user_can( 'edit_posts' ) ) {
 			// меняем статус
