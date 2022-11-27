@@ -37,7 +37,7 @@ class Amelia {
 					//do_action( 'Lt\PaidChange', $user->ID, null, null );
 					$start   = \DateTime::createFromFormat( 'Y-m-d H:i:s', $booking['payments'][0]['dateTime'] );
 					$options = get_option( Settings::$option_prefix . '_plugin_options_timing', true );
-					update_user_meta( $user->ID, 'paidfrom', $paidfrom = $start->setTime( 0, 0, 0 )->getTimestamp() );
+					update_user_meta( $user->ID, 'paidfrom', $paidfrom = $start->getTimestamp() );
 					update_user_meta( $user->ID, 'paidto', $paidto = $start->add( new \DateInterval(
 
 							Settings::parse_date_time(
@@ -48,7 +48,7 @@ class Amelia {
 						)
 
 
-					)->setTime( 23, 59, 59 )->getTimestamp() );
+					)->getTimestamp() );
 					do_action( 'Lt\PaidChange', $user->ID, $paidfrom, $paidto );
 
 				}
@@ -73,7 +73,7 @@ class Amelia {
 				}
 				$start   = \DateTime::createFromFormat( 'Y-m-d H:i:s', $booking['bookingStart'] );
 				$options = get_option( Settings::$option_prefix . '_plugin_options_timing', true );
-				update_user_meta( $user->ID, 'paidfrom', $paidfrom = $start->setTime( 0, 0, 0 )->getTimestamp() );
+				update_user_meta( $user->ID, 'paidfrom', $paidfrom = $start->getTimestamp() );
 				update_user_meta( $user->ID, 'paidto', $paidto = $start->add( new \DateInterval(
 
 						Settings::parse_date_time(
@@ -84,7 +84,7 @@ class Amelia {
 					)
 
 
-				)->setTime( 23, 59, 59 )->getTimestamp() );
+				)->getTimestamp() );
 				do_action( 'Lt\PaidChange', $user->ID, $paidfrom, $paidto );
 			}
 		}
