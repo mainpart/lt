@@ -30,6 +30,10 @@ class ShortCode {
 
 		return "";
 	}
+	function convertation( $atts, $content = null ) {
+		$options = get_option( Settings::$option_prefix . '_payments_options' );
+		return $atts['amount'] * $options['convertation'];
+	}
 
 	private static $initiated = false;
 
@@ -38,6 +42,7 @@ class ShortCode {
 		if ( ! self::$initiated ) {
 			self::$initiated = true;
 			add_shortcode( 'userrole', [ self::class, 'shortcode' ] );
+			add_shortcode( 'convertation', [ self::class, 'convertation' ] );
 			add_action( 'admin_bar_menu', [ self::class, 'toolbar_link_to_mypage' ], 999 );
 		}
 

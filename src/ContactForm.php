@@ -56,8 +56,10 @@ class ContactForm {
 		//$contact_form->set_properties($mailprop);
 		$post = $contact_form->prop( 'mail' )['body'];
 
-		foreach ( $submission->get_posted_data() as $k => $v ) {
-			$post = str_replace( "[$k]", $v, $post );
+		foreach ( $submission->get_posted_data() as $k => $v ) {	
+			if (is_string($v)) {
+				$post = str_replace( "[$k]", $v, $post );
+			}
 		}
 		global $consultation_page_id;
 
