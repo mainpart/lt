@@ -147,9 +147,10 @@ class Payment {
 		if ( $user->exists() && $_POST['unaccepted'] != 'true' && $_POST['codepro'] == 'false' ) {
 			// ставим пользователю время подписки
 			$option = get_option( Settings::$option_prefix . '_payments_options' );
+			$convertation = $option['convertation'] ?: 1;
 			if ( isset( $option['match'] ) && is_array( $option['match'] ) ) {
 				foreach ( $option['match'] as $key => $value ) {
-					if ( $value['amount'] == $_POST['withdraw_amount'] ) {
+					if ( $value['amount'] == $_POST['withdraw_amount'] * $convertation ) {
 						$dt = Settings::parse_date_time(
 							$value['timevalue'],
 							$value['timespan'],

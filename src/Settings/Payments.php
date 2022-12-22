@@ -21,7 +21,10 @@ class Payments {
 			'dbi_plugin_setting_wallet'
 		], 'payment', 'payment_options_section' );
 
-
+		add_settings_field( Settings::$option_prefix . '_payments_convertation', 'Настройки конвертации', [
+			self::class,
+			'dbi_plugin_setting_convertation'
+		], 'payment', 'payment_options_section' );
 
 	}
 
@@ -42,9 +45,19 @@ class Payments {
 		echo "</select>";
 	}
 
+	public static function dbi_plugin_setting_convertation() {
+		?>
+		<p>Скольки рублям равна условная единица.</p>
+		<?php
+		$options = get_option( Settings::$option_prefix . '_payments_options' );
+		echo "<input type='text' name='lt_payments_options[convertation]' value='" . esc_attr( isset( $options['convertation'] ) ? $options['convertation'] : '' ) . "' />";
+	}
 
 	public static function dbi_plugin_setting_payment() {
 		$options = get_option( Settings::$option_prefix . '_payments_options' );
+		?>
+		<p>Стомость в условных единицах продления доступа</p>
+		<?php
 		echo "<div class=dupeable_outer>";
 		echo "<div class=dupeable_container>";
 		if (   is_array( $options['match']      ) ) {
@@ -67,7 +80,6 @@ class Payments {
 		echo "</div>
 		<button id=addrow>Add row</button>
 		</div>";
-
 
 	}
 
