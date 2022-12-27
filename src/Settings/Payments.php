@@ -26,6 +26,12 @@ class Payments {
 			'dbi_plugin_setting_convertation'
 		], 'payment', 'payment_options_section' );
 
+		add_settings_field( Settings::$option_prefix . '_payments_urls', 'Адреса переходов', [
+			self::class,
+			'dbi_plugin_setting_returnurl'
+		], 'payment', 'payment_options_section' );
+
+
 	}
 
 	public static function dbi_plugin_setting_wallet() {
@@ -44,6 +50,15 @@ class Payments {
 		}
 		echo "</select>";
 	}
+
+	public static function dbi_plugin_setting_returnurl() {
+		?>
+        <p>Адрес для страницы успешного возврата.</p>
+		<?php
+		$options = get_option( Settings::$option_prefix . '_payments_options' );
+		echo "<input type='text' name='lt_payments_options[payment_return_url]' value='" . esc_attr( isset( $options['payment_return_url'] ) ? $options['payment_return_url'] : '' ) . "' />";
+	}
+
 
 	public static function dbi_plugin_setting_convertation() {
 		?>
