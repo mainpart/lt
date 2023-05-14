@@ -21,12 +21,14 @@ class ComposerStaticInit2220e7d16862dfa99e8bef765976ce57
     );
 
     public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Lt\\Amelia' => __DIR__ . '/../..' . '/src/Amelia.php',
         'Lt\\CommentMailPro' => __DIR__ . '/../..' . '/src/CommentMailPro.php',
         'Lt\\ContactForm' => __DIR__ . '/../..' . '/src/ContactForm.php',
         'Lt\\Payment' => __DIR__ . '/../..' . '/src/Payment.php',
         'Lt\\PostType' => __DIR__ . '/../..' . '/src/PostType.php',
         'Lt\\Redirects' => __DIR__ . '/../..' . '/src/Redirects.php',
+        'Lt\\Schedule' => __DIR__ . '/../..' . '/src/Schedule.php',
         'Lt\\Settings' => __DIR__ . '/../..' . '/src/Settings.php',
         'Lt\\Settings\\Payments' => __DIR__ . '/../..' . '/src/Settings/Payments.php',
         'Lt\\ShortCode' => __DIR__ . '/../..' . '/src/ShortCode.php',

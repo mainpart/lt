@@ -66,6 +66,11 @@ class Payments {
 		<?php
 		$options = get_option( Settings::$option_prefix . '_payments_options' );
 		echo "<input type='text' name='lt_payments_options[convertation]' value='" . esc_attr( isset( $options['convertation'] ) ? $options['convertation'] : '' ) . "' />";
+		?>
+		<p>Автоматическое обновление с сайта ЦБР</p>
+		<?php
+		echo "<input type='checkbox' name='lt_payments_options[autoupdate]' value='yes'" . esc_attr( isset( $options['autoupdate'] ) ?  ' checked':'' ) . " />";
+
 	}
 
 	public static function dbi_plugin_setting_payment() {

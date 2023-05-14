@@ -8,7 +8,7 @@
    GitHub Plugin URI: https://github.com/mainpart/lt
    Primary Branch: main
    Domain Path: /languages
-   Version: 1.0.16
+   Version: 1.0.18
    Description: Плагин для организации консультаций
 */
 
@@ -48,7 +48,7 @@ class Plugin {
 		    add_action('plugins_loaded', ['Lt\Redirects', 'init']);
 		    add_action('plugins_loaded', ['Lt\Payment', 'init']);
 		    add_action('plugins_loaded', ['Lt\ShortCode', 'init']);
-
+		    add_action('plugins_loaded', ['Lt\Schedule', 'init']);
 		    self::$initiated = true;
 	    }
     }
