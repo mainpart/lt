@@ -8,7 +8,7 @@
    GitHub Plugin URI: https://github.com/mainpart/lt
    Primary Branch: main
    Domain Path: /languages
-   Version: 1.0.18
+   Version: 1.0.19
    Description: Плагин для организации консультаций
 */
 
